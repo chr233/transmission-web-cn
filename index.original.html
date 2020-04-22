@@ -53,14 +53,11 @@
         <div id="toolbar-start-all" title="全部开始"></div>
         <div id="toolbar-pause-all" title="全部暂停"></div>
         <div id="toolbar-inspector" title="切换信息面板"></div>
-        <div id="toolbar-separator-r"></div>
-        <div id="toolbar-computer" onclick="javascript:location.href = 'index.html';" title="桌面UI"></div>
-        <div id="toolbar-mobile" onclick="javascript:location.href = 'index.mobile.html';" title="移动UI"></div>
     </div>
 
     <div id="statusbar">
         <div id='filter'>
-            显示
+            <span id="filter">显示</span>&nbsp;
             <select id="filter-mode">
 				<option value="all">全部</option>
 				<option value="active">活动中</option>
@@ -559,6 +556,8 @@
         <div id="prefs-button" title="系统设置">&nbsp;</div>
         <div id="turtle-button" title="慢速模式">&nbsp;</div>
         <div id="compact-button" title="紧凑视图">&nbsp;</div>
+        <div id="computer-button" onclick="javascript:location.href = 'index.html?devicetype=computer';" title="桌面UI">&nbsp;</div>
+        <div id="mobile-button" onclick="javascript:location.href = 'index.mobile.html';" title="移动UI">&nbsp;</div>
 
         <ul class="ui-helper-hidden" id="footer_super_menu">
             <li id="about-button">关于</li>
@@ -567,12 +566,12 @@
             <li id="tipjar">TR赞助</li>-->
             <li>---</li>
             <li id="statistics">数据统计</li>
-            <li id="hotkeys">快捷键帮助</li>
+            <li id="hotkeys">热键帮助</li>
             <!--
 				<li id="toggle_notifications">Notifcations</li>
 				-->
             <li>---</li>
-            <li>下载限速设定
+            <li>下载限速&nbsp;&nbsp;
                 <ul id="footer_download_rate_menu">
                     <li radio-group="download-rate" id="unlimited_download_rate"><span class='ui-icon ui-icon-bullet'></span>无限制</li>
                     <li radio-group="download-rate" id="limited_download_rate">限制为 (10 kB/s)</li>
@@ -592,7 +591,7 @@
                     <li class='download-speed'>750 kB/s</li>
                 </ul>
             </li>
-            <li>上传限速设定
+            <li>上传限速&nbsp;&nbsp;
                 <ul id="footer_upload_rate_menu">
                     <li radio-group="upload-rate" id="unlimited_upload_rate"><span class='ui-icon ui-icon-bullet'></span>无限制</li>
                     <li radio-group="upload-rate" id="limited_upload_rate">限制为 (10 kB/s)</li>
@@ -613,7 +612,7 @@
                 </ul>
             </li>
             <li>---</li>
-            <li>排序方式设定
+            <li>排序方式&nbsp;&nbsp;
                 <ul id="footer_sort_menu">
                     <li radio-group="sort-mode" id="sort_by_queue_order">队列顺序</li>
                     <li radio-group="sort-mode" id="sort_by_activity">最后活动</li>

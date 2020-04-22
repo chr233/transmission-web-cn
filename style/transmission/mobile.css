@@ -111,15 +111,6 @@ div#toolbar>div#toolbar-separator {
     width: 3px;
 }
 
-div#toolbar>div#toolbar-separator-r {
-    height: 25px;
-    margin-top: 8px;
-    margin-bottom: 8px;
-    border-left: 1px solid #aaa;
-    width: 3px;
-    float: right;
-}
-
 div#toolbar>div#toolbar-open {
     background-image: url("images/toolbar-folder.png");
 }
@@ -142,16 +133,6 @@ div#toolbar>div#toolbar-start-all {
 
 div#toolbar>div#toolbar-pause-all {
     background-image: url("images/toolbar-pause-all.png");
-}
-
-div#toolbar>div#toolbar-mobile {
-    background-image: url("images/toolbar-mobile.png");
-    float: right;
-}
-
-div#toolbar>div#toolbar-computer {
-    background-image: url("images/toolbar-computer.png");
-    float: right;
 }
 
 div#toolbar>div#toolbar-inspector {
@@ -187,7 +168,15 @@ div#toolbar>*.disabled {
 
 #statusbar #filter {
     float: left;
-    margin-left: 5px;
+    margin-left: 3px;
+}
+
+#statusbar #filter {
+    margin-top: 3px;
+}
+
+#statusbar #filter * {
+    vertical-align: middle;
 }
 
 #statusbar #filter input#torrent_search {
@@ -240,19 +229,19 @@ ul.torrent_list {
     text-align: left;
     cursor: pointer;
     /**
- * Progressbar
- *
- * Each progressbar has three elemens: a parent container and two children,
- * complete and incomplete.
- *
- * The only thing needed to set the progressbar percentage is to set
- * the complete child's width as a percentage. This is because incomplete
- * is pinned to the full width and height of the parent, and complete
- * is pinned to the left side of the parent and has a higher z-index.
- *
- * The progressbar has different colors depending on its state, so there
- * are five 'decorator' classNames: paused, queued, magnet, leeching, seeding.
- */
+   * Progressbar
+   *
+   * Each progressbar has three elemens: a parent container and two children,
+   * complete and incomplete.
+   *
+   * The only thing needed to set the progressbar percentage is to set
+   * the complete child's width as a percentage. This is because incomplete
+   * is pinned to the full width and height of the parent, and complete
+   * is pinned to the left side of the parent and has a higher z-index.
+   *
+   * The progressbar has different colors depending on its state, so there
+   * are five 'decorator' classNames: paused, queued, magnet, leeching, seeding.
+   */
 }
 
 ul.torrent_list li.torrent {
@@ -1051,8 +1040,6 @@ div.torrent_footer #settings_menu {
 }
 
 div.torrent_footer #prefs-button {
-    -moz-border-radius: 5px;
-    border-radius: 5px;
     background-color: #dddddd;
     background-image: url("images/wrench.png");
     /* fallback */
@@ -1090,8 +1077,6 @@ div.torrent_footer #prefs-button.selected {
 }
 
 div.torrent_footer #turtle-button {
-    -moz-border-radius: 5px;
-    border-radius: 5px;
     background-color: #dddddd;
     background-image: url("images/turtle.png");
     /* fallback */
@@ -1148,8 +1133,6 @@ div.torrent_footer #turtle-button.selected {
 }
 
 div.torrent_footer #compact-button {
-    -moz-border-radius: 5px;
-    border-radius: 5px;
     background-color: #dddddd;
     background-image: url("images/compact.png");
     /* fallback */
@@ -1181,6 +1164,82 @@ div.torrent_footer #compact-button.selected {
     background-image: url("images/compact.png"), -ms-linear-gradient(top, #cdcdff, white);
     /* IE10 */
     background-image: url("images/compact.png"), -o-linear-gradient(top, #cdcdff, white);
+    /* Opera 11.10+ */
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+div.torrent_footer #computer-button {
+    float: right;
+    background-color: #dddddd;
+    background-image: url("images/computer.png");
+    /* fallback */
+    background-image: url("images/computer.png"), -webkit-gradient(linear, left top, left bottom, from(white), to(#BBB));
+    /* Saf4+, Chrome */
+    background-image: url("images/computer.png"), -webkit-linear-gradient(top, white, #BBB);
+    /* Chrome 10+, Saf5.1+ */
+    background-image: url("images/computer.png"), -moz-linear-gradient(top, white, #BBB);
+    /* FF3.6+ */
+    background-image: url("images/computer.png"), -ms-linear-gradient(top, white, #BBB);
+    /* IE10 */
+    background-image: url("images/computer.png"), -o-linear-gradient(top, white, #BBB);
+    /* Opera 11.10+ */
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+div.torrent_footer #mobile-button {
+    float: right;
+    background-color: #dddddd;
+    background-image: url("images/mobile.png");
+    /* fallback */
+    background-image: url("images/mobile.png"), -webkit-gradient(linear, left top, left bottom, from(white), to(#BBB));
+    /* Saf4+, Chrome */
+    background-image: url("images/mobile.png"), -webkit-linear-gradient(top, white, #BBB);
+    /* Chrome 10+, Saf5.1+ */
+    background-image: url("images/mobile.png"), -moz-linear-gradient(top, white, #BBB);
+    /* FF3.6+ */
+    background-image: url("images/mobile.png"), -ms-linear-gradient(top, white, #BBB);
+    /* IE10 */
+    background-image: url("images/mobile.png"), -o-linear-gradient(top, white, #BBB);
+    /* Opera 11.10+ */
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+div.torrent_footer #computer-button:active,
+div.torrent_footer #computer-button.selected {
+    background-color: #e6e6ff;
+    background-image: url("images/computer.png");
+    /* fallback */
+    background-image: url("images/computer.png"), -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(white));
+    /* Saf4+, Chrome */
+    background-image: url("images/computer.png"), -webkit-linear-gradient(top, #cdcdff, white);
+    /* Chrome 10+, Saf5.1+ */
+    background-image: url("images/computer.png"), -moz-linear-gradient(top, #cdcdff, white);
+    /* FF3.6+ */
+    background-image: url("images/computer.png"), -ms-linear-gradient(top, #cdcdff, white);
+    /* IE10 */
+    background-image: url("images/computer.png"), -o-linear-gradient(top, #cdcdff, white);
+    /* Opera 11.10+ */
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+div.torrent_footer #mobile-button:active,
+div.torrent_footer #mobile-button.selected {
+    background-color: #e6e6ff;
+    background-image: url("images/mobile.png");
+    /* fallback */
+    background-image: url("images/mobile.png"), -webkit-gradient(linear, left top, left bottom, from(#cdcdff), to(white));
+    /* Saf4+, Chrome */
+    background-image: url("images/mobile.png"), -webkit-linear-gradient(top, #cdcdff, white);
+    /* Chrome 10+, Saf5.1+ */
+    background-image: url("images/mobile.png"), -moz-linear-gradient(top, #cdcdff, white);
+    /* FF3.6+ */
+    background-image: url("images/mobile.png"), -ms-linear-gradient(top, #cdcdff, white);
+    /* IE10 */
+    background-image: url("images/mobile.png"), -o-linear-gradient(top, #cdcdff, white);
     /* Opera 11.10+ */
     background-position: center;
     background-repeat: no-repeat;

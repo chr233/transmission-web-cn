@@ -1363,7 +1363,7 @@ Transmission.prototype = {
         if (RPC._TurtleState in o) {
             b = o[RPC._TurtleState];
             e = $('#turtle-button');
-            text = ['Click to ', (b ? 'disable' : 'enable'), ' Temporary Speed Limits (', fmt.speed(o[RPC._TurtleUpSpeedLimit]), ' up,', fmt.speed(o[RPC._TurtleDownSpeedLimit]), ' down)'].join('');
+            text = [(b ? '禁用' : '启用'), '慢速模式 ( 上传 ', fmt.speed(o[RPC._TurtleUpSpeedLimit]), ' / 下载 ', fmt.speed(o[RPC._TurtleDownSpeedLimit]), ')'].join('');
             e.toggleClass('selected', b);
             e.attr('title', text);
         }
@@ -1373,7 +1373,7 @@ Transmission.prototype = {
             limited = o[RPC._DownSpeedLimited];
 
             e = menu.find('#limited_download_rate');
-            e.html('Limit (' + fmt.speed(limit) + ')');
+            e.html('限速 (' + fmt.speed(limit) + ')');
 
             if (!limited) {
                 e = menu.find('#unlimited_download_rate');
@@ -1386,7 +1386,7 @@ Transmission.prototype = {
             limited = o[RPC._UpSpeedLimited];
 
             e = menu.find('#limited_upload_rate');
-            e.html('Limit (' + fmt.speed(limit) + ')');
+            e.html('限速 (' + fmt.speed(limit) + ')');
 
             if (!limited) {
                 e = menu.find('#unlimited_upload_rate');
