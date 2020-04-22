@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=8,IE=9,IE=10">
+    <!-- ticket #4555 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link href="./images/favicon.ico" rel="icon" />
+    <link href="./images/favicon.png" rel="shortcut icon" />
+    <link rel="apple-touch-icon" href="./images/webclip-icon.png" />
+    <script type="text/javascript" src="./javascript/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="./javascript/jquery/jquery-migrate.min.js"></script>
+    <script type="text/javascript" src="./javascript/jquery/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="./javascript/jquery/jquery.ui-contextmenu.min.js"></script>
+    <link rel="stylesheet" href="./style/jqueryui/jquery-ui.min.css" type="text/css" media="all" />
+    <!--
+		<link media="screen" href="./style/transmission/mobile.css" type= "text/css" rel="stylesheet" />
+-->
+    <link media="only screen and (max-device-width: 480px)" href="./style/transmission/mobile.css" type="text/css" rel="stylesheet" />
+    <link media="screen and (min-device-width: 481px)" href="./style/transmission/common.css" type="text/css" rel="stylesheet" />
+    <!--[if IE 8]>
+		<link media="screen" href="./style/transmission/common.css" type="text/css" rel="stylesheet" />
+		<![endif]-->
+    <script type="text/javascript" src="./javascript/jquery/jquery.transmenu.min.js"></script>
+    <script type="text/javascript" src="./javascript/jquery/json2.min.js"></script>
+    <script type="text/javascript" src="./javascript/polyfill.js"></script>
+    <script type="text/javascript" src="./javascript/common.js"></script>
+    <script type="text/javascript" src="./javascript/inspector.js"></script>
+    <script type="text/javascript" src="./javascript/prefs-dialog.js"></script>
+    <script type="text/javascript" src="./javascript/remote.js"></script>
+    <script type="text/javascript" src="./javascript/transmission.js"></script>
+    <script type="text/javascript" src="./javascript/torrent.js"></script>
+    <script type="text/javascript" src="./javascript/torrent-row.js"></script>
+    <script type="text/javascript" src="./javascript/file-row.js"></script>
+    <script type="text/javascript" src="./javascript/dialog.js"></script>
+    <script type="text/javascript" src="./javascript/formatter.js"></script>
+    <script type="text/javascript" src="./javascript/notifications.js"></script>
+    <script type="text/javascript" src="./javascript/main.js"></script>
+    <title>Transmission Web 接口</title>
+</head>
+
+<body id="transmission_body">
+
+    <div id="toolbar">
+        <div id="toolbar-open" title="添加种子"></div>
+        <div id="toolbar-remove" title="删除已选中的种子"></div>
+        <div id="toolbar-separator"></div>
+        <div id="toolbar-start" title="开始已选中的种子"></div>
+        <div id="toolbar-pause" title="暂停已选中的种子"></div>
+        <div id="toolbar-separator"></div>
+        <div id="toolbar-start-all" title="全部开始"></div>
+        <div id="toolbar-pause-all" title="全部暂停"></div>
+        <div id="toolbar-inspector" title="切换信息面板"></div>
+        <div id="toolbar-separator-r"></div>
+        <div id="toolbar-computer" onclick="javascript:location.href = 'index.html';" title="桌面UI"></div>
+        <div id="toolbar-mobile" onclick="javascript:location.href = 'index.mobile.html';" title="移动UI"></div>
+    </div>
+
+    <div id="statusbar">
+        <div id='filter'>
+            显示
+            <select id="filter-mode">
+				<option value="all">全部</option>
+				<option value="active">活动中</option>
+				<option value="downloading">下载中</option>
+				<option value="seeding">做种中</option>
+				<option value="paused">已暂停</option>
+				<option value="finished">已完成</option>
+			</select>
+            <select id="filter-tracker"></select>
+            <input type="search" id="torrent_search" placeholder="搜索" />
+            <span id="filter-count">&nbsp;</span>
+        </div>
+
+        <div id='speed-info'>
+            <div id='speed-dn-container'>
+                <div id='speed-dn-icon'></div>
+                <div id='speed-dn-label'></div>
+            </div>
+            <div id='speed-up-container'>
+                <div id='speed-up-icon'></div>
+                <div id='speed-up-label'></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui-helper-hidden" id="prefs-dialog">
+        <ul>
+            <li id="prefs-tab-general"><a href="#prefs-page-torrents">基本设定</a></li>
+            <li id="prefs-tab-speed"><a href="#prefs-page-speed">宽带限制</a></li>
+            <li id="prefs-tab-peers"><a href="#prefs-page-peers">连接设定</a></li>
+            <li id="prefs-tab-network"><a href="#prefs-page-network">网络设定</a></li>
+            <li class="ui-tab-dialog-close"></li>
+        </ul>
+        <div>
+            <div id="prefs-page-torrents">
+                <div class="prefs-section">
+                    <div class="title">下载设置</div>
+                    <div class="row">
+                        <div class="key">默认保存位置:</div>
+                        <div class="value"><input type="text" id="download-dir" /></div>
+                    </div>
+                    <div class="checkbox-row"><input type="checkbox" id="start-added-torrents" /><label for="start-added-torrents">自动开始新添加的种子</label></div>
+                    <div class="checkbox-row"><input type="checkbox" id="rename-partial-files" /><label for="rename-partial-files">在未完成的文件名后加上 &quot;.part&quot; 后缀</label></div>
+                </div>
+                <div class="prefs-section">
+                    <div class="title">做种设置</div>
+                    <div class="row">
+                        <div class="key"><input type="checkbox" id="seedRatioLimited" /><label for="seedRatioLimited">当种子的分享率达到这个数时，自动停止做种:</label></div>
+                        <div class="value"><input type="number" min="0" id="seedRatioLimit" /></div>
+                    </div>
+                    <div class="row">
+                        <div class="key"><input type="checkbox" id="idle-seeding-limit-enabled" /><label for="idle-seeding-limit-enabled">当种子超过这个时间没有流量时，自动停止做种：</label></div>
+                        <div class="value"><input type="number" min="1" max="40320" id="idle-seeding-limit" /></div>
+                    </div>
+                </div>
+            </div>
+            <div id="prefs-page-speed">
+                <div class="prefs-section">
+                    <div class="title">速度限制</div>
+                    <div class="row">
+                        <div class="key"><input type="checkbox" id="speed-limit-up-enabled" /><label for="speed-limit-up-enabled">上传限速 (kB/s):</label></div>
+                        <div class="value"><input type="number" min="0" id="speed-limit-up" /></div>
+                    </div>
+                    <div class="row">
+                        <div class="key"><input type="checkbox" id="speed-limit-down-enabled" /><label for="speed-limit-down-enabled">下载限速 (kB/s):</label></div>
+                        <div class="value"><input type="number" min="0" id="speed-limit-down" /></div>
+                    </div>
+                </div>
+                <div class="prefs-section">
+                    <div class="title">
+                        <div id="alternative-speed-limits-title">慢速模式限速</div>
+                    </div>
+                    <div class="row" id="alternative-speed-limits-desc">开启慢速模式后生效，覆盖上面的速度限制</div>
+                    <div class="row">
+                        <div class="key">上传限速 (kB/s):</div>
+                        <div class="value"><input type="number" min="0" id="alt-speed-up" /></div>
+                    </div>
+                    <div class="row">
+                        <div class="key">下载限速 (kB/s):</div>
+                        <div class="value"><input type="number" min="0" id="alt-speed-down" /></div>
+                    </div>
+                    <div class="checkbox-row"><input type="checkbox" id="alt-speed-time-enabled" /><label for="alt-speed-time-enabled">启用时间段限制</label></div>
+                    <div class="row">
+                        <div class="key">开始时间:</div>
+                        <div class="value"><select id="alt-speed-time-begin"></select></div>
+                    </div>
+                    <div class="row">
+                        <div class="key">结束时间:</div>
+                        <div class="value"><select id="alt-speed-time-end"></select></div>
+                    </div>
+                    <div class="row">
+                        <div class="key"><label for="alt-speed-time-day">星期:</label></div>
+                        <div class="value"><select id="alt-speed-time-day">
+								<option value="127">每天</option>
+								<option value="62">工作日</option>
+								<option value="65">周末</option>
+								<option value="1">周日</option>
+								<option value="2">周一</option>
+								<option value="4">周二</option>
+								<option value="8">周三</option>
+								<option value="16">周四</option>
+								<option value="32">周五</option>
+								<option value="64">周六</option>
+							</select></div>
+                    </div>
+                </div>
+            </div>
+            <div id="prefs-page-peers">
+                <div class="prefs-section">
+                    <div class="title">连接设定</div>
+                    <div class="row">
+                        <div class="key"><label for="peer-limit-per-torrent">Max peers per torrent:</label></div>
+                        <div class="value"><input type="number" min="0" id="peer-limit-per-torrent" /></div>
+                    </div>
+                    <div class="row">
+                        <div class="key"><label for="peer-limit-global">Max peers overall:</label></div>
+                        <div class="value"><input type="number" min="0" id="peer-limit-global" /></div>
+                    </div>
+                </div>
+                <div class="prefs-section">
+                    <div class="title">高级选项</div>
+                    <div class="row">
+                        <div class="key">数据传输加密方式:</div>
+                        <div class="value"><select id="encryption">
+								<option value="tolerated">允许加密</option>
+								<option value="preferred">优先加密</option>
+								<option value="required">强制加密</option>
+							</select></div>
+                    </div>
+                    <div class="checkbox-row"><input type="checkbox" id="pex-enabled" title="PEX is a tool for exchanging peer lists with the peers you're connected to." />
+                        <label for="pex-enabled" title="PEX is a tool for exchanging peer lists with the peers you're connected to.">启用PEX(节点信息交换)</label>
+                    </div>
+                    <div class="checkbox-row"><input type="checkbox" id="dht-enabled" title="DHT is a tool for finding peers without a tracker." />
+                        <label for="dht-enabled" title="DHT is a tool for finding peers without a tracker.">启用DHT(分布式哈希表)</label></div>
+                    <div class="checkbox-row"><input type="checkbox" id="lpd-enabled" title="LPD is a tool for finding peers on your local network." />
+                        <label for="lpd-enabled" title="LPD is a tool for finding peers on your local network.">启用LPD(本地节点发现)</label></div>
+                </div>
+                <div class="prefs-section">
+                    <div class="title">黑名单</div>
+                    <div class="row">
+                        <div class="key"><input type="checkbox" id="blocklist-enabled" /><label for="blocklist-enabled">启用黑名单列表:</label></div>
+                        <div class="value"><input type="url" id="blocklist-url" /></div>
+                    </div>
+                    <div class="row">
+                        <div class="key" id="blocklist-info">黑名单中共有 <span id="blocklist-size">?</span> 条规则
+                        </div>
+                        <div class="value"><input type="button" id="blocklist-update-button" value="Update" /></div>
+                    </div>
+                </div>
+            </div>
+            <div id="prefs-page-network">
+                <div class="prefs-section">
+                    <div class="title">监听端口</div>
+                    <div class="row">
+                        <div class="key"><label for="peer-port">数据传输端口:</label></div>
+                        <div class="value"><input type="number" min="0" max="65535" id="peer-port" /></div>
+                    </div>
+                    <div class="row">
+                        <div class="key">&nbsp;</div>
+                        <div class="value"><span id="port-label">状态: 未知</span></div>
+                    </div>
+                    <div class="checkbox-row"><input type="checkbox" id="peer-port-random-on-start" /><label for="peer-port-random-on-start">启用随机端口</label></div>
+                    <div class="checkbox-row"><input type="checkbox" id="port-forwarding-enabled" /><label for="port-forwarding-enabled">启用端口转发</label></div>
+                </div>
+                <div class="prefs-section">
+                    <div class="title">高级选项</div>
+                    <div class="checkbox-row"><input type="checkbox" id="utp-enabled" title="uTP is a tool for reducing network congestion." />
+                        <label for="utp-enabled" title="uTP is a tool for reducing network congestion.">启用 μTP(UPnP)</label></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui-helper-hidden" id="torrent_inspector">
+
+        <div id="inspector-tabs-wrapper">
+            <div id="inspector-tabs">
+                <div class="inspector-tab selected" id="inspector-tab-info" title="常规">
+                    <a href="#info"></a>
+                </div>
+                <div class="inspector-tab" id="inspector-tab-peers" title="用户">
+                    <a href="#peers"></a>
+                </div>
+                <div class="inspector-tab" id="inspector-tab-trackers" title="服务器">
+                    <a href="#trackers"></a>
+                </div>
+                <div class="inspector-tab" id="inspector-tab-files" title="文件">
+                    <a href="#files"></a>
+                </div>
+            </div>
+            <!-- inspector-tabs -->
+        </div>
+        <!-- inspector-tabs-wrapper -->
+
+        <div id="inspector_header">
+            <div id="torrent_inspector_name"></div>
+            <span id="torrent_inspector_size"></span>
+        </div>
+
+        <div class="inspector-page" id="inspector-page-info">
+            <div class="prefs-section">
+                <div class="title">基本信息</div>
+                <div class="row">
+                    <div class="key">进度:</div>
+                    <div class="value" id="inspector-info-have">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="key">可用性:</div>
+                    <div class="value" id="inspector-info-availability">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="key">已上传:</div>
+                    <div class="value" id="inspector-info-uploaded">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="key">已下载:</div>
+                    <div class="value" id="inspector-info-downloaded">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="key">状态:</div>
+                    <div class="value" id="inspector-info-state">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="key">已用时间:</div>
+                    <div class="value" id="inspector-info-running-time">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="key">剩余时间:</div>
+                    <div class="value" id="inspector-info-remaining-time">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="key">最后活动于:</div>
+                    <div class="value" id="inspector-info-last-activity">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="key">错误信息:</div>
+                    <div class="value" id="inspector-info-error">&nbsp;</div>
+                </div>
+            </div>
+            <div class="prefs-section">
+                <div class="title">详细信息</div>
+                <div class="row">
+                    <div class="key">文件大小:</div>
+                    <div class="value" id="inspector-info-size">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="key">保存位置:</div>
+                    <div class="value" id="inspector-info-location">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="key">种子哈希:</div>
+                    <div class="value" id="inspector-info-hash">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="key">Privacy:</div>
+                    <div class="value" id="inspector-info-privacy">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="key">来源信息:</div>
+                    <div class="value" id="inspector-info-origin">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="key">备注说明:</div>
+                    <div class="value" id="inspector-info-comment">&nbsp;</div>
+                </div>
+            </div>
+        </div>
+        <!-- id="inspector_tab_info_container" -->
+
+        <div class="inspector-page ui-helper-hidden" id="inspector-page-peers">
+            <div id="inspector_peers_list">
+            </div>
+        </div>
+        <!-- id="inspector_tab_peers_container" -->
+
+        <div class="inspector-page ui-helper-hidden" id="inspector-page-trackers">
+            <div id="inspector_trackers_list">
+            </div>
+        </div>
+        <!-- id="inspector_tab_trackers_container" -->
+
+        <div class="inspector-page ui-helper-hidden" id="inspector-page-files">
+            <ul id="inspector_file_list">
+            </ul>
+        </div>
+        <!-- id="inspector_tab_files_container" -->
+
+    </div>
+
+    <div id="torrent_container">
+        <ul class="torrent_list" id="torrent_list"></ul>
+    </div>
+
+    <div class="dialog_container ui-helper-hidden" id="dialog_container">
+        <div class="dialog_top_bar"></div>
+        <div class="dialog_window">
+            <div class="dialog_logo" id="dialog_logo"></div>
+            <h2 class="dialog_heading" id="dialog_heading"></h2>
+            <div class="dialog_message" id="dialog_message"></div>
+            <a href="#confirm" id="dialog_confirm_button">确认</a>
+            <a href="#cancel" id="dialog_cancel_button">取消</a>
+        </div>
+    </div>
+
+    <div class="ui-helper-hidden" id="about-dialog">
+        <p id="about-logo"></p>
+        <p id="about-title">Transmission X</p>
+        <p id="about-blurb">又快又好的 BT 客户端</p>
+        <p id="about-copyright">版权所有 (c) The Transmission Project</p>
+    </div>
+
+    <div class="ui-helper-hidden" id="stats-dialog">
+        <div class="prefs-section">
+            <div class="title">当前会话</div>
+            <div class="row">
+                <div class="key">已上传:</div>
+                <div class="value" id='stats-session-uploaded'>&nbsp;</div>
+            </div>
+            <div class="row">
+                <div class="key">已下载:</div>
+                <div class="value" id='stats-session-downloaded'>&nbsp;</div>
+            </div>
+            <div class="row">
+                <div class="key">总分享率:</div>
+                <div class="value" id='stats-session-ratio'>&nbsp;</div>
+            </div>
+            <div class="row">
+                <div class="key">活动时间:</div>
+                <div class="value" id='stats-session-duration'>&nbsp;</div>
+            </div>
+        </div>
+        <div class="prefs-section">
+            <div class="title">累计</div>
+            <div class="row">
+                <div class="key">启动次数:</div>
+                <div class="value" id='stats-total-count'>&nbsp;</div>
+            </div>
+            <div class="row">
+                <div class="key">已上传:</div>
+                <div class="value" id='stats-total-uploaded'>&nbsp;</div>
+            </div>
+            <div class="row">
+                <div class="key">已下载:</div>
+                <div class="value" id='stats-total-downloaded'>&nbsp;</div>
+            </div>
+            <div class="row">
+                <div class="key">总分享率:</div>
+                <div class="value" id='stats-total-ratio'>&nbsp;</div>
+            </div>
+            <div class="row">
+                <div class="key">活动时间:</div>
+                <div class="value" id='stats-total-duration'>&nbsp;</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui-helper-hidden" id="hotkeys-dialog">
+        <table>
+            <thead>
+                <tr>
+                    <th>按键</th>
+                    <th>动作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>/</td>
+                    <td>显示快捷键帮助</td>
+                </tr>
+                <tr>
+                    <td>,</td>
+                    <td>打开设置面板</td>
+                </tr>
+                <tr>
+                    <td>ENTER</td>
+                    <td>确认</td>
+                </tr>
+                <tr>
+                    <td>ESC</td>
+                    <td>取消</td>
+                </tr>
+                <tr>
+                    <td>A</td>
+                    <td>选择所有种子</td>
+                </tr>
+                <tr>
+                    <td>SHIFT + A</td>
+                    <td>取消选择所有种子</td>
+                </tr>
+                <tr>
+                    <td>C</td>
+                    <td>切换视图</td>
+                </tr>
+                <tr>
+                    <td>D</td>
+                    <td>删除选中的种子</td>
+                </tr>
+                <tr>
+                    <td>Backspace</td>
+                    <td>删除选中的种子</td>
+                </tr>
+                <tr>
+                    <td>DEL</td>
+                    <td>删除选中的种子</td>
+                </tr>
+                <tr>
+                    <td>I</td>
+                    <td>显示/隐藏详情面板</td>
+                </tr>
+                <tr>
+                    <td>L</td>
+                    <td>移动种子/设置保存位置</td>
+                </tr>
+                <tr>
+                    <td>M</td>
+                    <td>移动种子/设置保存位置</td>
+                </tr>
+                <tr>
+                    <td>O</td>
+                    <td>添加种子</td>
+                </tr>
+                <tr>
+                    <td>U</td>
+                    <td>添加种子</td>
+                </tr>
+                <tr>
+                    <td>P</td>
+                    <td>暂停选中的种子</td>
+                </tr>
+                <tr>
+                    <td>R</td>
+                    <td>继续选中的种子</td>
+                </tr>
+                <tr>
+                    <td>T</td>
+                    <td>启用/禁用慢速模式</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="dialog_container ui-helper-hidden" id="upload_container">
+        <div class="dialog_top_bar"></div>
+        <div class="dialog_window">
+            <div class="dialog_logo" id="upload_dialog_logo"></div>
+            <h2 class="dialog_heading">添加种子</h2>
+            <form action="#" method="post" id="torrent_upload_form" enctype="multipart/form-data" target="torrent_upload_frame" autocomplete="off">
+                <div class="dialog_message">
+                    <label for="torrent_upload_file">种子文件(优先于URL):</label>
+                    <input type="file" name="torrent_files[]" id="torrent_upload_file" multiple="multiple" />
+                    <label for="torrent_upload_url">种子地址:</label>
+                    <input type="url" id="torrent_upload_url" />
+                    <label id='add-dialog-folder-label' for="add-dialog-folder-input">保存目录:</label>
+                    <input type="text" id="add-dialog-folder-input" />
+                    <input type="checkbox" id="torrent_auto_start" />
+                    <label for="torrent_auto_start" id="auto_start_label">添加后立即开始</label>
+                </div>
+                <a href="#upload" id="upload_confirm_button">确定</a>
+                <a href="#cancel" id="upload_cancel_button">取消</a>
+            </form>
+        </div>
+    </div>
+
+    <div class="dialog_container ui-helper-hidden" id="rename_container">
+        <div class="dialog_top_bar"></div>
+        <div class="dialog_window">
+            <div class="dialog_logo"></div>
+            <h2 class="dialog_heading">重命名种子</h2>
+            <div class="dialog_message">
+                <label for="torrent_rename_name">新的名字:</label>
+                <input type="text" id="torrent_rename_name" />
+            </div>
+            <a href="#rename" id="rename_confirm_button">确定</a>
+            <a href="#cancel" id="rename_cancel_button">取消</a>
+        </div>
+    </div>
+
+    <div class="dialog_container ui-helper-hidden" id="move_container">
+        <div class="dialog_top_bar"></div>
+        <div class="dialog_window">
+            <div class="dialog_logo" id="move_dialog_logo"></div>
+            <h2 class="dialog_heading">设置保存目录</h2>
+            <form action="#" method="post" id="torrent_move_form" enctype="multipart/form-data" target="torrent_move_frame">
+                <div class="dialog_message">
+                    <label for="torrent_path">新的目录:</label>
+                    <input type="text" id="torrent_path" />
+                </div>
+                <a href="#move" id="move_confirm_button">确定</a>
+                <a href="#cancel" id="move_cancel_button">取消</a>
+            </form>
+        </div>
+    </div>
+
+    <div class="torrent_footer">
+        <div id="settings_menu" title="显示设置">&nbsp;</div>
+        <div id="prefs-button" title="系统设置">&nbsp;</div>
+        <div id="turtle-button" title="慢速模式">&nbsp;</div>
+        <div id="compact-button" title="紧凑视图">&nbsp;</div>
+
+        <ul class="ui-helper-hidden" id="footer_super_menu">
+            <li id="about-button">关于</li>
+            <!--<li>---</li>
+            <li id="homepage">TR主页</li>
+            <li id="tipjar">TR赞助</li>-->
+            <li>---</li>
+            <li id="statistics">数据统计</li>
+            <li id="hotkeys">快捷键帮助</li>
+            <!--
+				<li id="toggle_notifications">Notifcations</li>
+				-->
+            <li>---</li>
+            <li>下载限速设定
+                <ul id="footer_download_rate_menu">
+                    <li radio-group="download-rate" id="unlimited_download_rate"><span class='ui-icon ui-icon-bullet'></span>无限制</li>
+                    <li radio-group="download-rate" id="limited_download_rate">限制为 (10 kB/s)</li>
+                    <li>---</li>
+                    <li class='download-speed'>5 kB/s</li>
+                    <li class='download-speed'>10 kB/s</li>
+                    <li class='download-speed'>20 kB/s</li>
+                    <li class='download-speed'>30 kB/s</li>
+                    <li class='download-speed'>40 kB/s</li>
+                    <li class='download-speed'>50 kB/s</li>
+                    <li class='download-speed'>75 kB/s</li>
+                    <li class='download-speed'>100 kB/s</li>
+                    <li class='download-speed'>150 kB/s</li>
+                    <li class='download-speed'>200 kB/s</li>
+                    <li class='download-speed'>250 kB/s</li>
+                    <li class='download-speed'>500 kB/s</li>
+                    <li class='download-speed'>750 kB/s</li>
+                </ul>
+            </li>
+            <li>上传限速设定
+                <ul id="footer_upload_rate_menu">
+                    <li radio-group="upload-rate" id="unlimited_upload_rate"><span class='ui-icon ui-icon-bullet'></span>无限制</li>
+                    <li radio-group="upload-rate" id="limited_upload_rate">限制为 (10 kB/s)</li>
+                    <li>---</li>
+                    <li class='upload-speed'>5 kB/s</li>
+                    <li class='upload-speed'>10 kB/s</li>
+                    <li class='upload-speed'>20 kB/s</li>
+                    <li class='upload-speed'>30 kB/s</li>
+                    <li class='upload-speed'>40 kB/s</li>
+                    <li class='upload-speed'>50 kB/s</li>
+                    <li class='upload-speed'>75 kB/s</li>
+                    <li class='upload-speed'>100 kB/s</li>
+                    <li class='upload-speed'>150 kB/s</li>
+                    <li class='upload-speed'>200 kB/s</li>
+                    <li class='upload-speed'>250 kB/s</li>
+                    <li class='upload-speed'>500 kB/s</li>
+                    <li class='upload-speed'>750 kB/s</li>
+                </ul>
+            </li>
+            <li>---</li>
+            <li>排序方式设定
+                <ul id="footer_sort_menu">
+                    <li radio-group="sort-mode" id="sort_by_queue_order">队列顺序</li>
+                    <li radio-group="sort-mode" id="sort_by_activity">最后活动</li>
+                    <li radio-group="sort-mode" id="sort_by_age">添加时间</li>
+                    <li radio-group="sort-mode" id="sort_by_name">种子名称</li>
+                    <li radio-group="sort-mode" id="sort_by_percent_completed">下载进度</li>
+                    <li radio-group="sort-mode" id="sort_by_ratio">分享率</li>
+                    <li radio-group="sort-mode" id="sort_by_size">文件大小</li>
+                    <li radio-group="sort-mode" id="sort_by_state">当前状态</li>
+                    <li>---</li>
+                    <li id="reverse_sort_order">逆序排列</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <ul class="ui-helper-hidden" id="torrent_context_menu">
+        <li data-command="pause_selected">暂停</li>
+        <li data-command="resume_selected">恢复</li>
+        <li data-command="resume_now_selected">恢复并立即开始</li>
+        <li>---</li>
+        <li data-command="move_top">队列最前</li>
+        <li data-command="move_up">队列上移</li>
+        <li data-command="move_down">队列下移</li>
+        <li data-command="move_bottom">队列最后</li>
+        <li>---</li>
+        <li data-command="remove">删除种子…</li>
+        <li data-command="remove_data">删除种子和文件…</li>
+        <li>---</li>
+        <li data-command="verify">校验本地文件</li>
+        <li data-command="move">设置保存目录…</li>
+        <li data-command="rename">重命名种子…</li>
+        <li>---</li>
+        <li data-command="reannounce">获取更多Peer</li>
+        <li>---</li>
+        <li data-command="select_all">全部选择</li>
+        <li data-command="deselect_all">取消选择</li>
+    </ul>
+
+    <iframe name="torrent_upload_frame" id="torrent_upload_frame" src="about:blank"></iframe>
+</body>
+
+</html>
