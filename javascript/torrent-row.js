@@ -328,7 +328,7 @@ TorrentRendererCompact.prototype = {
             var have_up = t.getUploadSpeed() > 0;
 
             if (!have_up && !have_dn) {
-                return 'Idle';
+                return '闲置中';
             };
             var s = '';
             if (!isMobileDevice) {
