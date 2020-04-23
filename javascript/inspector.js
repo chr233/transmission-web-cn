@@ -679,32 +679,32 @@ function Inspector(controller) {
             var timeUntilAnnounce, s = '';
             switch (tracker.announceState) {
                 case Torrent._TrackerActive:
-                    s = 'Announce in progress';
+                    s = '更新中';
                     break;
                 case Torrent._TrackerWaiting:
                     timeUntilAnnounce = tracker.nextAnnounceTime - ((new Date()).getTime() / 1000);
                     if (timeUntilAnnounce < 0) {
                         timeUntilAnnounce = 0;
                     }
-                    s = 'Next announce in ' + Transmission.fmt.timeInterval(timeUntilAnnounce);
+                    s = '下次更新: ' + Transmission.fmt.timeInterval(timeUntilAnnounce) + '后';
                     break;
                 case Torrent._TrackerQueued:
-                    s = 'Announce is queued';
+                    s = '等待更新';
                     break;
                 case Torrent._TrackerInactive:
                     s = tracker.isBackup ?
-                        'Tracker will be used as a backup' :
-                        'Announce not scheduled';
+                        '将作为备用服务器' :
+                        '未安排更新';
                     break;
                 default:
-                    s = 'unknown announce state: ' + tracker.announceState;
+                    s = '未知: ' + tracker.announceState;
             }
             return s;
         },
 
         lastAnnounceStatus = function(tracker) {
 
-            var lastAnnounceLabel = 'Last Announce',
+            var lastAnnounceLabel = '最后更新',
                 lastAnnounce = ['N/A'],
                 lastAnnounceTime;
 
@@ -713,7 +713,7 @@ function Inspector(controller) {
                 if (tracker.lastAnnounceSucceeded) {
                     lastAnnounce = [lastAnnounceTime, ' (got ', Transmission.fmt.countString('peer', 'peers', tracker.lastAnnouncePeerCount), ')'];
                 } else {
-                    lastAnnounceLabel = 'Announce error';
+                    lastAnnounceLabel = '更新出错';
                     lastAnnounce = [(tracker.lastAnnounceResult ? (tracker.lastAnnounceResult + ' - ') : ''), lastAnnounceTime];
                 }
             }
@@ -725,7 +725,7 @@ function Inspector(controller) {
 
         lastScrapeStatus = function(tracker) {
 
-            var lastScrapeLabel = 'Last Scrape',
+            var lastScrapeLabel = '抓取时间',
                 lastScrape = 'N/A',
                 lastScrapeTime;
 
@@ -734,7 +734,7 @@ function Inspector(controller) {
                 if (tracker.lastScrapeSucceeded) {
                     lastScrape = lastScrapeTime;
                 } else {
-                    lastScrapeLabel = 'Scrape error';
+                    lastScrapeLabel = '抓取出错';
                     lastScrape = (tracker.lastScrapeResult ? tracker.lastScrapeResult + ' - ' : '') + lastScrapeTime;
                 }
             }
