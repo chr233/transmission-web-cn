@@ -12,5 +12,8 @@
 
   - `yes | mv ./transmission-web-cn/* /usr/share/transmission/web/` 
 
+  - 需要清除浏览器缓存才能看到汉化效果，或者按 `Ctrl` + `F5` 强制刷新
+
 预览图：
+
   ![截图](https://i.loli.net/2020/04/22/vlLmqTpzM34CacO.png)
