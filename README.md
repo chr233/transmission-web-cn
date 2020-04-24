@@ -1,7 +1,7 @@
 #### 说明
 基于原版 [Trnsmission](https://github.com/transmission/transmission) 的WebUI进行修改，几乎完美汉化。
 
-安装方法：
+#### 安装方法：
   - `git clone https://github.com/chr233/transmission-web-cn`
 
   - 注意：
@@ -14,6 +14,6 @@
 
   - 需要清除浏览器缓存才能看到汉化效果，或者按 `Ctrl` + `F5` 强制刷新
 
-预览图：
+#### 预览图：
 
   ![截图](https://i.loli.net/2020/04/22/vlLmqTpzM34CacO.png)
